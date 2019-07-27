@@ -8,7 +8,7 @@ class Encoder {
     encode() {
         return new Promise((resolve, reject) => {
             let ffmpeg = '/opt/svt-av1/bin/ffmpeg'; // fixme
-            let input = 'Fallout4.y4m';
+            let input = 'media/Fallout4.y4m';
             let bitrate = 8000000;
     
             let args = [];
