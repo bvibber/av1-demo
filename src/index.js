@@ -16,6 +16,10 @@ document.getElementById('encode').onclick = function(event) {
         link.href = url;
         link.textContent = url;
 
+        const vlc = document.createElement('a');
+        vlc.href = 'vlc:' + link.href;
+        vlc.textContent = 'Open in VLC';
+
         output.textContent = '';
         output.appendChild(link);
     });
