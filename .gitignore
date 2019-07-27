@@ -1,1 +1,4 @@
 node_modules
+dist/main.js
+output/*.m3u8
+output/*.mp4
