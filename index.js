@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const express = require('express');
 const app = express();
 const port = 8080;
@@ -17,10 +19,22 @@ app.post('/encode', (req, res) => {
     if (encoding) {
         res.json(null);
     } else {
-        const url = `output/hls-stream-${encodingIndex}-master.m3u`;
+        const main = `output/hls-stream-${encodingIndex}.m3u8`
+        const bitrate = 8000000;
+
+        const url = `output/hls-stream-${encodingIndex}-master.m3u8`;
+        let master = '#EXTM3U\n' +
+            '#EXT-X-VERSION:7\n' +
+            `#EXT-X-STREAM-INF:BANDWIDTH=${bitrate},RESOLUTION=1920x1080,CODECS="av01.0.09M.08"\n` +
+            main.replace(/^output\//, '');
+        fs.writeFileSync(url, master);
+
         encoding = true;
         encodingIndex++;
-        encoder = new Encoder(url);
+        encoder = new Encoder({
+            dest: main,
+            bitrate: bitrate
+        });
         encoder.start().then(() => {
             encoding = false;
         });
