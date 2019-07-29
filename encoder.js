@@ -4,6 +4,8 @@ class Encoder {
     constructor(options) {
         this.dest = options.dest;
         this.bitrate = options.bitrate;
+        this.width = options.width;
+        this.height = options.height;
     }
 
     start() {
@@ -15,6 +17,10 @@ class Encoder {
             let args = [];
             args.push('-i');
             args.push(input);
+            if (this.width && this.height) {
+                args.push('-vf');
+                args.push(`scale=w=${this.width}:h=${this.height}:force_original_aspect_ratio=decrease`);
+            }
             args.push('-c:v');
             args.push('libsvt_av1');
             args.push('-threads');

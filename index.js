@@ -4,15 +4,18 @@ const express = require('express');
 const app = express();
 const port = 8080;
 
+const devHack = true; // enable hacks for running faster on dev station
+
 const Encoder = require('./encoder.js');
 let encoding = false;
 let encodingIndex = 0;
 let encoder = null;
+let currentUrl = null;
 
 //app.get('/', (req, res) => res.send('Hello world'));
 
-app.get('/encoding', (req, res) => {
-    res.json(encoding);
+app.get('/current', (req, res) => {
+    res.json(currentUrl);
 });
 
 app.post('/encode', (req, res) => {
@@ -30,11 +33,18 @@ app.post('/encode', (req, res) => {
         fs.writeFileSync(url, master);
 
         encoding = true;
+        currentUrl = url;
         encodingIndex++;
-        encoder = new Encoder({
+
+        let options = {
             dest: main,
             bitrate: bitrate
-        });
+        };
+        if (devHack) {
+            options.width = 640;
+            options.height = 360;
+        }
+        encoder = new Encoder(options);
         encoder.start().then(() => {
             encoding = false;
         });
