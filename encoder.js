@@ -46,7 +46,11 @@ class Encoder {
             args.push('-y');
             args.push(this.dest);
     
-            child_process.execFile(ffmpeg, args, (error, stdout, stderr) => {
+            const options = {
+                maxBuffer: 1024 * 1024 * 10,
+            };
+            child_process.execFile(ffmpeg, args, options, (error, stdout, stderr) => {
+                console.log('return code', error);
                 console.log(stdout);
                 console.error(stderr);
                 resolve();
