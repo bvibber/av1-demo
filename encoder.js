@@ -3,6 +3,7 @@ const child_process = require('child_process');
 class Encoder {
     constructor(options) {
         this.dest = options.dest;
+        this.base = options.base;
         this.bitrate = options.bitrate;
         this.width = options.width;
         this.height = options.height;
@@ -35,6 +36,7 @@ class Encoder {
             args.push('1');
             args.push('-b:v');
             args.push(String(this.bitrate));
+            /*
             args.push('-hls_segment_type');
             args.push('fmp4');
             // args.push('-hls_segment_filename');
@@ -43,6 +45,17 @@ class Encoder {
             // args.push(input + '.init.mp4');
             args.push('-hls_list_size');
             args.push('99999');
+            */
+            args.push('-f', 'dash');
+            args.push('-live', '1');
+            args.push('-seg_duration', '1');
+            args.push('-window_size', '7200');
+            args.push('-use_template', '1');
+            args.push('-use_timeline', '0');
+            args.push('-init_seg_name', this.base + '.init.m4a');
+            args.push('-media_seg_name', this.base + '.$RepresentationID$.$Number$.m4s');
+            //args.push('-dash_segment_type', 'webm');
+            //args.push('-adaptation_sets', 'id=0,streams=v');
             args.push('-y');
             args.push(this.dest);
     

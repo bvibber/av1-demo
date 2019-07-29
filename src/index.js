@@ -5,6 +5,8 @@ console.log('hello world');
 
 const output = document.getElementById('output');
 
+videojs.log.level('debug');
+
 function showVideo(url) {
     const link = document.createElement('a');
     link.href = url;
@@ -33,7 +35,10 @@ function showVideo(url) {
         output.appendChild(video);
 
         const vjs = videojs(video);
-        vjs.src(url);
+        vjs.src({
+            src: url,
+            type: 'application/dash+xml'
+        });
         vjs.play();
     }
 }
