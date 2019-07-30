@@ -24,7 +24,8 @@ app.post('/encode', (req, res) => {
     } else {
         const base = `dash-stream-${encodingIndex}.mpd`;
         const main = `output/${base}`;
-        const bitrate = 8000000;
+        const bitrate = 4000000;
+        const bitrate_small = 2000000;
 
         //const url = `output/hls-stream-${encodingIndex}-master.m3u8`;
         const url = main;
@@ -44,12 +45,17 @@ app.post('/encode', (req, res) => {
         let options = {
             dest: main,
             base: base,
-            bitrate: bitrate
+            bitrate: bitrate,
+            bitrate_small: bitrate_small,
         };
+        /*
         if (devHack) {
             options.width = 640;
             options.height = 360;
+            options.bitrate = options.bitrate / 4;
+            options.bitrate_small = options.bitrate_small / 4;
         }
+        */
         encoder = new Encoder(options);
         encoder.start().then(() => {
             encoding = false;

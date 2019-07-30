@@ -5,6 +5,7 @@ class Encoder {
         this.dest = options.dest;
         this.base = options.base;
         this.bitrate = options.bitrate;
+        this.bitrate_small = options.bitrate_small;
         this.width = options.width;
         this.height = options.height;
     }
@@ -12,40 +13,36 @@ class Encoder {
     start() {
         return new Promise((resolve, reject) => {
             let ffmpeg = '/opt/svt-av1/bin/ffmpeg'; // fixme
-            let input = 'media/Fallout4.y4m';
-            let threads = 6;
+            //let input = 'media/Fallout4.y4m';
+            let input = 'media/sintel_trailer_2k_1080p24.y4m';
+            let threads = 6; // fixme
     
             let args = [];
+            args.push('-loglevel', 'debug');
+
             args.push('-i');
             args.push(input);
-            if (this.width && this.height) {
-                args.push('-vf');
-                args.push(`scale=w=${this.width}:h=${this.height}:force_original_aspect_ratio=decrease`);
-            }
-            args.push('-c:v');
-            args.push('libsvt_av1');
-            args.push('-threads');
-            args.push(String(threads)); // fixme
-            args.push('-tile-columns');
-            args.push('2');
-            args.push('-rc');
-            args.push('vbr');
-            args.push('-flags');
-            args.push('cgop');
-            args.push('-forced-idr');
-            args.push('1');
-            args.push('-b:v');
-            args.push(String(this.bitrate));
-            /*
-            args.push('-hls_segment_type');
-            args.push('fmp4');
-            // args.push('-hls_segment_filename');
-            // args.push(input + '.%03d.mp4');
-            // args.push('-hls_fmp4_init_filename');
-            // args.push(input + '.init.mp4');
-            args.push('-hls_list_size');
-            args.push('99999');
-            */
+
+            args.push('-map', '0:v:0');
+            args.push('-map', '0:v:0');
+
+            args.push('-filter:v:0', `scale=w=856:h=480:force_original_aspect_ratio=decrease`);
+            args.push('-c:v:0', 'libsvt_av1');
+            args.push('-threads:v:0', String(threads));
+            args.push('-tile-columns:v:0', '2');
+            args.push('-rc:v:0', 'vbr');
+            args.push('-flags:v:0', 'cgop');
+            args.push('-forced-idr:v:0', '1');
+            args.push('-b:v:0', String(this.bitrate_small));
+
+            args.push('-c:v:1', 'libsvt_av1');
+            args.push('-threads:v:1', String(threads));
+            args.push('-tile-columns:v:1', '2');
+            args.push('-rc:v:1', 'vbr');
+            args.push('-flags:v:1', 'cgop');
+            args.push('-forced-idr:v:1', '1');
+            args.push('-b:v:1', String(this.bitrate));
+
             args.push('-f', 'dash');
             args.push('-live', '1');
             args.push('-seg_duration', '1');
@@ -55,7 +52,7 @@ class Encoder {
             args.push('-init_seg_name', this.base + '.init.webm');
             args.push('-media_seg_name', this.base + '.$RepresentationID$.$Number$.webm');
             args.push('-dash_segment_type', 'webm');
-            //args.push('-adaptation_sets', 'id=0,streams=v');
+            args.push('-adaptation_sets', 'id=0,streams=v');
             args.push('-y');
             args.push(this.dest);
     
