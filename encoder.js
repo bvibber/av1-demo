@@ -20,28 +20,40 @@ class Encoder {
             let args = [];
             args.push('-loglevel', 'debug');
 
+            args.push('-re');
             args.push('-i');
             args.push(input);
 
             args.push('-map', '0:v:0');
             args.push('-map', '0:v:0');
 
-            args.push('-filter:v:0', `scale=w=856:h=480:force_original_aspect_ratio=decrease`);
+            args.push('-filter:v:0', `scale=w=640:h=360:force_original_aspect_ratio=decrease`);
             args.push('-c:v:0', 'libsvt_av1');
+            args.push('-b:v:0', String(this.bitrate_small));
+
+            args.push('-filter:v:1', `scale=w=1280:h=720:force_original_aspect_ratio=decrease`);
+            args.push('-c:v:1', 'libsvt_av1');
+            args.push('-b:v:1', String(this.bitrate));
+
+            args.push('-threads', String(threads));
+            args.push('-tile-columns', '2');
+            //args.push('-rc', 'vbr');
+            args.push('-flags', 'cgop');
+            args.push('-forced-idr', '1');
+
+            /*
             args.push('-threads:v:0', String(threads));
             args.push('-tile-columns:v:0', '2');
             args.push('-rc:v:0', 'vbr');
-            args.push('-flags:v:0', 'cgop');
+            args.push('-flags:v:0', '+cgop');
             args.push('-forced-idr:v:0', '1');
-            args.push('-b:v:0', String(this.bitrate_small));
 
-            args.push('-c:v:1', 'libsvt_av1');
             args.push('-threads:v:1', String(threads));
             args.push('-tile-columns:v:1', '2');
             args.push('-rc:v:1', 'vbr');
-            args.push('-flags:v:1', 'cgop');
+            args.push('-flags:v:1', '+cgop');
             args.push('-forced-idr:v:1', '1');
-            args.push('-b:v:1', String(this.bitrate));
+            */
 
             args.push('-f', 'dash');
             args.push('-live', '1');
@@ -49,7 +61,7 @@ class Encoder {
             args.push('-window_size', '7200');
             args.push('-use_template', '1');
             args.push('-use_timeline', '0');
-            args.push('-init_seg_name', this.base + '.init.webm');
+            args.push('-init_seg_name', this.base + '.$RepresentationID$.init.webm');
             args.push('-media_seg_name', this.base + '.$RepresentationID$.$Number$.webm');
             args.push('-dash_segment_type', 'webm');
             args.push('-adaptation_sets', 'id=0,streams=v');

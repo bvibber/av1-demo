@@ -203,7 +203,8 @@ class FakeDash {
     }
 
     fetchInitSegment() {
-        let local = this.segmentInfo.init;
+        let local = this.segmentInfo.init
+            .replace('$RepresentationID$', this.repId);
         let url = (new URL(local, this.url)).toString();
 
         fetch(url).then((response) => {
