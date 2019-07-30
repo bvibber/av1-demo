@@ -152,6 +152,8 @@ class FakeDash {
         this.div.appendChild(this.ogv);
 
         this.fails = 0;
+
+        this.onsegmentloaded = null;
     }
 
     load() {
@@ -258,6 +260,11 @@ class FakeDash {
                                 this.video.play();
                             }
                             this.fetching = null;
+
+                            if (this.onsegmentloaded) {
+                                this.onsegmentloaded(buf);
+                            }
+
                             resolve();
                         });
                     }

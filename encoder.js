@@ -8,6 +8,8 @@ class Encoder {
         this.bitrate_small = options.bitrate_small;
         this.width = options.width;
         this.height = options.height;
+        this.devHack = options.devHack;
+        this.threads = options.threads;
     }
 
     start() {
@@ -15,10 +17,9 @@ class Encoder {
             let ffmpeg = '/opt/svt-av1/bin/ffmpeg'; // fixme
             //let input = 'media/Fallout4.y4m';
             let input = 'media/sintel_trailer_2k_1080p24.y4m';
-            let threads = 6; // fixme
     
             let args = [];
-            args.push('-loglevel', 'debug');
+            //args.push('-loglevel', 'debug');
 
             args.push('-re');
             args.push('-i');
@@ -27,33 +28,29 @@ class Encoder {
             args.push('-map', '0:v:0');
             args.push('-map', '0:v:0');
 
-            args.push('-filter:v:0', `scale=w=640:h=360:force_original_aspect_ratio=decrease`);
+            if (this.devHack) {
+                args.push('-filter:v:0', `scale=w=640:h=360`);
+            } else {
+                args.push('-filter:v:0', `scale=w=856:h=480`);
+            }
             args.push('-c:v:0', 'libsvt_av1');
             args.push('-b:v:0', String(this.bitrate_small));
 
-            args.push('-filter:v:1', `scale=w=1280:h=720:force_original_aspect_ratio=decrease`);
+            if (this.devHack) {
+                args.push('-filter:v:1', `scale=w=1280:h=720`);
+            } else {
+                args.push('-filter:v:1', `scale=w=1920:h=1080`);
+            }
             args.push('-c:v:1', 'libsvt_av1');
             args.push('-b:v:1', String(this.bitrate));
 
-            args.push('-threads', String(threads));
+            if (this.threads) {
+                args.push('-threads', String(this.threads));
+            }
             args.push('-tile-columns', '2');
             //args.push('-rc', 'vbr');
             args.push('-flags', 'cgop');
             args.push('-forced-idr', '1');
-
-            /*
-            args.push('-threads:v:0', String(threads));
-            args.push('-tile-columns:v:0', '2');
-            args.push('-rc:v:0', 'vbr');
-            args.push('-flags:v:0', '+cgop');
-            args.push('-forced-idr:v:0', '1');
-
-            args.push('-threads:v:1', String(threads));
-            args.push('-tile-columns:v:1', '2');
-            args.push('-rc:v:1', 'vbr');
-            args.push('-flags:v:1', '+cgop');
-            args.push('-forced-idr:v:1', '1');
-            */
 
             args.push('-f', 'dash');
             args.push('-live', '1');

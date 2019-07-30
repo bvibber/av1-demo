@@ -47,15 +47,14 @@ app.post('/encode', (req, res) => {
             base: base,
             bitrate: bitrate,
             bitrate_small: bitrate_small,
+            devHack: devHack,
+            threads: 0, // auto
         };
-        /*
         if (devHack) {
-            options.width = 640;
-            options.height = 360;
             options.bitrate = options.bitrate / 4;
             options.bitrate_small = options.bitrate_small / 4;
+            options.threads = 6;
         }
-        */
         encoder = new Encoder(options);
         encoder.start().then(() => {
             encoding = false;
