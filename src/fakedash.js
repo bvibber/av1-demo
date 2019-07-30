@@ -26,7 +26,7 @@ class AppendOnlyInputStream {
 
     appendBuffer(buffer) {
         console.log('appending ' + buffer.byteLength);
-        this.segments.push(buffer);
+        this.segments.push(new Uint8Array(buffer));
         this.segmentOffsets.push(this.max);
         this.max += buffer.byteLength;
     }
@@ -86,11 +86,11 @@ class AppendOnlyInputStream {
         let segment = null;
         let segmentOffset = 0;
         for (let i = 0; i < this.segments.length; i++) {
-            if (this.offset < this.segmentOffsets[i]) {
+            if (this.segmentOffsets[i] + this.segments[i].length < this.offset) {
                 continue;
             }
             segmentIndex = i;
-            segment = new Uint8Array(this.segments[segmentIndex]);
+            segment = this.segments[segmentIndex];
             segmentOffset = this.segmentOffsets[segmentIndex];
             break;
         }
@@ -99,12 +99,12 @@ class AppendOnlyInputStream {
             if (n >= segment.length) {
                 segmentIndex++;
                 segmentOffset = this.segmentOffsets[segmentIndex];
-                segment = new Uint8Array(this.segments[segmentIndex]);
+                segment = this.segments[segmentIndex];
                 n = 0;
             }
             buf[i] = segment[n];
         }
-        console.log('readSync got ' + buf.length + ' for ' + nbytes + ' at ' + this.offset);
+        //console.log('readSync got ' + buf.length + ' for ' + nbytes + ' at ' + this.offset);
         //console.log(buf);
         this.offset += buf.length;
         return buf.buffer;
