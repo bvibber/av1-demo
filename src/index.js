@@ -98,32 +98,7 @@ function awaitVideo(url) {
 }
 
 function awaitEncoding() {
-    fetch('/current').then((response) => {
-        return response.json();
-    }).then((url) => {
-        if (!url) {
-            setTimeout(() => {
-                awaitEncoding();
-            }, 250);
-            return;
-        } else {
-            document.getElementById('encode').disabled = true;
-            awaitVideo(url);
-        }
-    });
+    awaitVideo('output/dash-stream-0.mpd');
 }
-
-document.getElementById('encode').onclick = function(event) {
-    this.disabled = true;
-    output.textContent = 'contacting server';
-
-    fetch('/encode', {
-        method: 'POST',
-        body: 'do it' // ignored
-    }).then(response => response.json()).then((url) => {
-        this.disabled = false;
-        awaitVideo(url);
-    });
-};
 
 awaitEncoding();
