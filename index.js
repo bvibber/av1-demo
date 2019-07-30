@@ -6,8 +6,8 @@ const port = 8080;
 
 let devHack = false; // enable hacks for running faster on dev station
 let threads = 0; // auto
-devHack = true;
-threads = 6;
+//devHack = true;
+//threads = 6;
 
 const Encoder = require('./encoder.js');
 let encoding = false;
