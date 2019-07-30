@@ -82,23 +82,6 @@ class AppendOnlyInputStream {
         let bufOffset = 0;
 
         // oh a horrible hack
-        /*
-        let segmentOffset = 0;
-        for (let i = 0; i < this.segments.length; i++) {
-            let segment = this.segments[i];
-            if (segmentOffset + segment.length >= start) {
-                let chunkOffset = start - off;
-                let chunkLen = Math.min(end - start, segment.length);
-                let chunk = new Uint8Array(segment, chunkOffset, chunkLen);
-                buf.set(chunk, bufOffset);
-                bufOffset += chunkLen;
-            }
-            segmentOffset += segment.length;
-            if (bufOffset >= buf.byteLength) {
-                break;
-            }
-        }
-        */
         let segmentIndex = 0;
         let segment = null;
         let segmentOffset = 0;
@@ -111,18 +94,18 @@ class AppendOnlyInputStream {
             segmentOffset = this.segmentOffsets[segmentIndex];
             break;
         }
-        for (let i = start; i < end; i++) {
-            let n = i - segmentOffset;
+        for (let i = 0; i < end - start; i++) {
+            let n = i + start - segmentOffset;
             if (n >= segment.length) {
                 segmentIndex++;
                 segmentOffset = this.segmentOffsets[segmentIndex];
                 segment = new Uint8Array(this.segments[segmentIndex]);
                 n = 0;
             }
-            buf[i - this.offset] = segment[n];
+            buf[i] = segment[n];
         }
         console.log('readSync got ' + buf.length + ' for ' + nbytes + ' at ' + this.offset);
-        console.log(buf);
+        //console.log(buf);
         this.offset += buf.length;
         return buf.buffer;
     }
@@ -162,11 +145,13 @@ class FakeDash {
         this.ogv = new OGVPlayer({
             stream: this.stream,
             video: this.video,
-            debug: true,
+            //debug: true,
         });
         this.ogv.width = video.width;
         this.ogv.height = video.height;
         this.div.appendChild(this.ogv);
+
+        this.fails = 0;
     }
 
     load() {
@@ -236,34 +221,48 @@ class FakeDash {
     }
 
     fetchNextSegment() {
-        return new Promise((resolve, reject) => {
-            let index = this.nextSegment;
-            let local = this.segmentInfo.media
-                .replace('$RepresentationID$', this.repId)
-                .replace('$Number$', String(index));
-            let url = (new URL(local, this.url)).toString();
-            fetch(url).then((response) => {
-                if (response.status == 404) {
-                    setTimeout(() => {
-                        this.fetchNextSegment().then(resolve);
-                    }, 250);
-                } else {
-                    this.nextSegment++;
-                    response.arrayBuffer().then((buf) => {
-                        this.stream.appendBuffer(buf);
-                        this.duration += this.segmentInfo.duration;
-    
-                        if (this.duration - this.video.currentTime < 3) {
-                            this.fetchNextSegment();
-                        } else if (this.buffering) {
-                            this.buffering = false;
-                            this.ogv.play();
-                            this.video.play();
+        if (this.fetching) {
+            return this.fetching;
+        }
+        return this.fetching = new Promise((resolve, reject) => {
+            let fetchit = () => {
+                let index = this.nextSegment;
+                let local = this.segmentInfo.media
+                    .replace('$RepresentationID$', this.repId)
+                    .replace('$Number$', String(index));
+                let url = (new URL(local, this.url)).toString();
+                fetch(url).then((response) => {
+                    if (response.status >= 400) {
+                        this.fails++;
+                        if (this.fails > 20) {
+                            throw new Error('too many fails');
                         }
-                    });
-                    resolve();
-                }
-            });
+                        setTimeout(() => {
+                            fetchit();
+                        }, 250);
+                    } else {
+                        this.fails = 0;
+                        this.nextSegment++;
+                        response.arrayBuffer().then((buf) => {
+                            this.stream.appendBuffer(buf);
+                            this.duration += this.segmentInfo.duration;
+        
+                            if (this.duration - this.ogv.currentTime < 3) {
+                                setTimeout(() => {
+                                    this.fetchNextSegment();
+                                }, 250);
+                            } else if (this.buffering) {
+                                this.buffering = false;
+                                this.ogv.play();
+                                this.video.play();
+                            }
+                            this.fetching = null;
+                            resolve();
+                        });
+                    }
+                });
+            };
+            fetchit();
         });
     }
 }
