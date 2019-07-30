@@ -12,7 +12,6 @@
   "devDependencies": {
     "css-loader": "^3.1.0",
     "style-loader": "^0.23.1",
-    "video.js": "file:../video.js",
     "webpack": "^4.38.0",
     "webpack-cli": "^3.3.6"
   },

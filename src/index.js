@@ -43,9 +43,21 @@ function showVideo(url) {
         });
         vjs.play();
         */
-       let mp = dashjs.MediaPlayer().create();
-       mp.initialize(video, url, true /* autoplay */);
+        let mp = dashjs.MediaPlayer().create();
+        mp.initialize(video, url, true /* autoplay */);
     }
+}
+
+function awaitVideo(url) {
+    fetch(url).then((response) => {
+        if (response.status == 404) {
+            setTimeout(() => {
+                awaitVideo(url);
+            }, 250);
+        } else {
+            showVideo(url);
+        }
+    });
 }
 
 document.getElementById('encode').onclick = function(event) {
@@ -57,8 +69,7 @@ document.getElementById('encode').onclick = function(event) {
         body: 'do it' // ignored
     }).then(response => response.json()).then((url) => {
         this.disabled = false;
-
-        showVideo(url);
+        awaitVideo(url);
     });
 };
 
