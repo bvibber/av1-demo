@@ -25,6 +25,10 @@ function updateBandwidth() {
 }
 
 function showVideo(url) {
+    if (video) {
+        return;
+    }
+
     const link = document.createElement('a');
     link.href = url;
     link.textContent = url;
@@ -93,6 +97,21 @@ function awaitVideo(url) {
     });
 }
 
+function awaitEncoding() {
+    fetch('/current').then((response) => {
+        return response.json();
+    }).then((url) => {
+        if (!url) {
+            setTimeout(() => {
+                awaitEncoding();
+            }, 250);
+            return;
+        } else {
+            awaitVideo(url);
+        }
+    });
+}
+
 document.getElementById('encode').onclick = function(event) {
     this.disabled = true;
     output.textContent = 'contacting server';
@@ -106,10 +125,4 @@ document.getElementById('encode').onclick = function(event) {
     });
 };
 
-fetch('/current', {
-    method: 'GET',
-}).then(response => response.json()).then((url) => {
-    if (url) {
-        showVideo(url);
-    }
-});
+awaitEncoding();
