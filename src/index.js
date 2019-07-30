@@ -10,6 +10,20 @@ const output = document.getElementById('output');
 
 //videojs.log.level('debug');
 
+let video;
+
+let segmentSizes = [];
+function updateBandwidth() {
+    let ratio = 24 / 33;
+    let segment = Math.trunc(video.currentTime * ratio); // hackkkkk
+    let len = segmentSizes[segment] * ratio;
+
+    if (len) {
+        let bw = Math.round(len * 8 / 1000) + 'kbits/s';
+        document.getElementById('bw').textContent = bw;
+    }
+}
+
 function showVideo(url) {
     const link = document.createElement('a');
     link.href = url;
@@ -18,7 +32,7 @@ function showVideo(url) {
     output.className = '';
     output.textContent = '';
 
-    const video = document.createElement('video');
+    video = document.createElement('video');
     video.width = 1280;
     video.height = 720;
     video.controls = true;
@@ -35,11 +49,11 @@ function showVideo(url) {
 
     if (navigator.userAgent.match(/Safari/)) {
         let fd = new FakeDash(video, url);
+        video = fd.ogv;
         fd.load();
         fd.onsegmentloaded = (arr) => {
             let len = arr.byteLength;
-            let bw = Math.round(len * 8 / 1000) + 'kbits/s';
-            document.getElementById('bw').textContent = bw;
+            segmentSizes.push(len);
         };
         video.addEventListener('loadedmetadata', () => {
             let res = `${video.videoWidth}x${video.videoHeight}`;
@@ -49,10 +63,11 @@ function showVideo(url) {
         let mp = dashjs.MediaPlayer().create();
         mp.initialize(video, url, true /* autoplay */);
         mp.on('fragmentLoadingCompleted', (event) => {
+            //console.log(event);
             if (event.response) {
                 let len = event.response.byteLength;
-                let bw = Math.round(len * 8 / 1000) + 'kbits/s';
-                document.getElementById('bw').textContent = bw;
+                let index = event.request.startTime; // hack
+                segmentSizes[index] = len;
             }
         });
         mp.on('qualityChangeRendered', (event) => {
@@ -61,6 +76,9 @@ function showVideo(url) {
             document.getElementById('res').textContent = res;
         });
     }
+    video.addEventListener('timeupdate', () => {
+        updateBandwidth();
+    });
 }
 
 function awaitVideo(url) {

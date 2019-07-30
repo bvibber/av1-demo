@@ -51,6 +51,7 @@ class Encoder {
             //args.push('-rc', 'vbr');
             args.push('-flags', 'cgop');
             args.push('-forced-idr', '1');
+            args.push('-qp', '42');
 
             args.push('-f', 'dash');
             args.push('-live', '1');
