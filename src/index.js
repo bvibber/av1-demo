@@ -1,11 +1,12 @@
-const videojs = require('video.js').default;
-require('!style-loader!css-loader!video.js/dist/video-js.css');
+//const videojs = require('video.js').default;
+//require('!style-loader!css-loader!video.js/dist/video-js.css');
+require('./dash.all.min.js');
 
 console.log('hello world');
 
 const output = document.getElementById('output');
 
-videojs.log.level('debug');
+//videojs.log.level('debug');
 
 function showVideo(url) {
     const link = document.createElement('a');
@@ -28,18 +29,22 @@ function showVideo(url) {
         video.controls = true;
         video.playsInline = true;
         video.muted = true;
-        video.className = 'video-js vjs-default-skin';
+        //video.className = 'video-js vjs-default-skin';
 
         output.className = 'player';
         output.appendChild(link);
         output.appendChild(video);
 
+        /*
         const vjs = videojs(video);
         vjs.src({
             src: url,
             type: 'application/dash+xml'
         });
         vjs.play();
+        */
+       let mp = dashjs.MediaPlayer().create();
+       mp.initialize(video, url, true /* autoplay */);
     }
 }
 

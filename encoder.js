@@ -52,9 +52,9 @@ class Encoder {
             args.push('-window_size', '7200');
             args.push('-use_template', '1');
             args.push('-use_timeline', '0');
-            args.push('-init_seg_name', this.base + '.init.m4a');
-            args.push('-media_seg_name', this.base + '.$RepresentationID$.$Number$.m4s');
-            //args.push('-dash_segment_type', 'webm');
+            args.push('-init_seg_name', this.base + '.init.webm');
+            args.push('-media_seg_name', this.base + '.$RepresentationID$.$Number$.webm');
+            args.push('-dash_segment_type', 'webm');
             //args.push('-adaptation_sets', 'id=0,streams=v');
             args.push('-y');
             args.push(this.dest);
