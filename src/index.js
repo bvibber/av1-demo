@@ -2,6 +2,8 @@
 //require('!style-loader!css-loader!video.js/dist/video-js.css');
 require('./dash.all.min.js');
 
+let FakeDash = require('./fakedash.js');
+
 console.log('hello world');
 
 const output = document.getElementById('output');
@@ -19,30 +21,24 @@ function showVideo(url) {
 
     output.className = '';
     output.textContent = '';
-    if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
-        output.className = 'vlc';
-        output.appendChild(vlc);
+
+const video = document.createElement('video');
+    video.width = 854;
+    video.height = 480;
+    video.controls = true;
+    video.playsInline = true;
+    video.muted = true;
+
+    output.className = 'player';
+    output.appendChild(link);
+    output.appendChild(video);
+
+    if (navigator.userAgent.match(/Safari/)) {
+        //output.className = 'vlc';
+        //output.appendChild(vlc);
+        let fd = new FakeDash(video, url);
+        fd.load();
     } else {
-        const video = document.createElement('video');
-        video.width = 854;
-        video.height = 480;
-        video.controls = true;
-        video.playsInline = true;
-        video.muted = true;
-        //video.className = 'video-js vjs-default-skin';
-
-        output.className = 'player';
-        output.appendChild(link);
-        output.appendChild(video);
-
-        /*
-        const vjs = videojs(video);
-        vjs.src({
-            src: url,
-            type: 'application/dash+xml'
-        });
-        vjs.play();
-        */
         let mp = dashjs.MediaPlayer().create();
         mp.initialize(video, url, true /* autoplay */);
     }
