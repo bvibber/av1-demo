@@ -107,6 +107,7 @@ function awaitEncoding() {
             }, 250);
             return;
         } else {
+            document.getElementById('encode').disabled = true;
             awaitVideo(url);
         }
     });
