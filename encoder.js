@@ -14,8 +14,12 @@ class Encoder {
 
     start() {
         return new Promise((resolve, reject) => {
-            //let ffmpeg = '/opt/svt-av1/bin/ffmpeg'; // fixme
-            let ffmpeg = '/home/user/tools/bin/ffmpeg';
+            let ffmpeg;
+            if (this.devHack) {
+                ffmpeg = '/opt/svt-av1/bin/ffmpeg';
+            } else {
+                ffmpeg = '/home/user/tools/bin/ffmpeg';
+            }
             //let input = 'media/Fallout4.y4m';
             let input = 'media/sintel_trailer_2k_1080p24.y4m';
     

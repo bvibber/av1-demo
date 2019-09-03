@@ -51,7 +51,7 @@ function showVideo(url) {
     div.appendChild(video);
 
 
-    if (navigator.userAgent.match(/Safari/)) {
+    if (navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Edg/)) {
         let fd = new FakeDash(video, url);
         video = fd.ogv;
         fd.load();
