@@ -1,0 +1,13 @@
+{
+    "ffmpeg": "/opt/svt-av1/bin/ffmpeg",
+    "threads": 6,
+    "input": "sintel_trailer_2k_1080p24.y4m",
+    "resolutions": [
+        [640, 360],
+        [1280, 720]
+    ],
+    "bitrates": [
+        500000,
+        1000000
+    ]
+}

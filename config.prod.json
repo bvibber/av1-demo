@@ -1,0 +1,12 @@
+{
+    "ffmpeg": "/home/user/tools/bin/ffmpeg",
+    "input": "sintel_trailer_2k_1080p24.y4m",
+    "resolutions": [
+        [856, 480],
+        [1920, 1080]
+    ],
+    "bitrates": [
+        1000000,
+        2000000
+    ]
+}

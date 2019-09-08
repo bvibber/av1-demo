@@ -1,27 +1,16 @@
 const child_process = require('child_process');
+const config = require('./config.json');
 
 class Encoder {
     constructor(options) {
         this.dest = options.dest;
         this.base = options.base;
-        this.bitrate = options.bitrate;
-        this.bitrate_small = options.bitrate_small;
-        this.width = options.width;
-        this.height = options.height;
-        this.devHack = options.devHack;
-        this.threads = options.threads;
     }
 
     start() {
         return new Promise((resolve, reject) => {
-            let ffmpeg;
-            if (this.devHack) {
-                ffmpeg = '/opt/svt-av1/bin/ffmpeg';
-            } else {
-                ffmpeg = '/home/user/tools/bin/ffmpeg';
-            }
-            //let input = 'media/Fallout4.y4m';
-            let input = 'media/sintel_trailer_2k_1080p24.y4m';
+            let ffmpeg = config.ffmpeg;
+            let input = 'media/' + config.input;
     
             let args = [];
             //args.push('-loglevel', 'debug');
@@ -30,27 +19,18 @@ class Encoder {
             args.push('-i');
             args.push(input);
 
-            args.push('-map', '0:v:0');
-            args.push('-map', '0:v:0');
-
-            if (this.devHack) {
-                args.push('-filter:v:0', `scale=w=640:h=360`);
-            } else {
-                args.push('-filter:v:0', `scale=w=856:h=480`);
+            for (let i = 0; i < config.resolutions.length; i++) {
+                args.push('-map', '0:v:0');
             }
-            args.push('-c:v:0', 'libsvt_av1');
-            args.push('-b:v:0', String(this.bitrate_small));
 
-            if (this.devHack) {
-                args.push('-filter:v:1', `scale=w=1280:h=720`);
-            } else {
-                args.push('-filter:v:1', `scale=w=1920:h=1080`);
+            for (let i = 0; i < config.resolutions.length; i++) {
+                args.push(`-filter:v:${i}`, `scale=w=${config.resolutions[i][0]}:h=${config.resolutions[i][1]}`);
+                args.push(`-c:v:${i}`, 'libsvt_av1');
+                args.push(`-b:v:${i}`, `${config.bitrates[i]}`);
             }
-            args.push('-c:v:1', 'libsvt_av1');
-            args.push('-b:v:1', String(this.bitrate));
 
-            if (this.threads) {
-                args.push('-threads', String(this.threads));
+            if (config.threads) {
+                args.push('-threads', String(config.threads));
             }
             args.push('-tile-columns', '2');
             //args.push('-rc', 'vbr');
@@ -74,6 +54,7 @@ class Encoder {
             const options = {
                 maxBuffer: 1024 * 1024 * 10,
             };
+            console.log(ffmpeg, args);
             child_process.execFile(ffmpeg, args, options, (error, stdout, stderr) => {
                 console.log('return code', error);
                 console.log(stdout);

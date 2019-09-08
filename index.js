@@ -28,8 +28,6 @@ app.post('/encode', (req, res) => {
     } else {
         const base = `dash-stream-${encodingIndex}.mpd`;
         const main = `output/${base}`;
-        const bitrate = 2000000;
-        const bitrate_small = 1000000;
 
         const url = main;
 
@@ -40,16 +38,7 @@ app.post('/encode', (req, res) => {
         let options = {
             dest: main,
             base: base,
-            bitrate: bitrate,
-            bitrate_small: bitrate_small,
-            devHack: devHack,
-            threads: threads
         };
-        if (devHack) {
-            options.bitrate = options.bitrate / 2;
-            options.bitrate_small = options.bitrate_small / 2;
-            options.threads = 6;
-        }
         encoder = new Encoder(options);
         encoder.start().then(() => {
             encoding = false;
