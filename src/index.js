@@ -11,6 +11,7 @@ const output = document.getElementById('output');
 //videojs.log.level('debug');
 
 let video;
+let currentUrl;
 
 let segmentSizes = [];
 function updateBandwidth() {
@@ -25,8 +26,13 @@ function updateBandwidth() {
 }
 
 function showVideo(url) {
+    // Keep looking in case it changes.
+    // @todo: switch polling to a WebSocket thing.
+    awaitEncoding();
+
     if (video) {
-        return;
+        video.parentNode.removeChild(video);
+        video = null;
     }
 
     const link = document.createElement('a');
@@ -102,11 +108,17 @@ function awaitEncoding() {
         return response.json();
     }).then((url) => {
         if (!url) {
+            currentUrl = url;
+            document.getElementById('encode').disabled = false;
             setTimeout(() => {
                 awaitEncoding();
             }, 250);
-            return;
+        } else if (url == currentUrl) {
+            setTimeout(() => {
+                awaitEncoding();
+            }, 250);
         } else {
+            currentUrl = url;
             document.getElementById('encode').disabled = true;
             awaitVideo(url);
         }

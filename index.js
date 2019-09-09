@@ -42,6 +42,7 @@ app.post('/encode', (req, res) => {
         encoder = new Encoder(options);
         encoder.start().then(() => {
             encoding = false;
+            currentUrl = null;
         });
         res.json(url);
     }
