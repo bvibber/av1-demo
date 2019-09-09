@@ -9,6 +9,8 @@ class Encoder {
 
     start() {
         return new Promise((resolve, reject) => {
+            this.cleanup();
+
             let ffmpeg = config.ffmpeg;
             let input = 'media/' + config.input;
     
@@ -63,6 +65,11 @@ class Encoder {
                 resolve();
             });
         });
+    }
+
+    cleanup() {
+        let cmd = `rm -f '${this.dest}'*`;
+        child_process.execSync(cmd);
     }
 }
 

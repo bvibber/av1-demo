@@ -15,6 +15,7 @@ let encoding = false;
 let encodingIndex = 0;
 let encoder = null;
 let currentUrl = null;
+let lastEncoder = null;
 
 //app.get('/', (req, res) => res.send('Hello world'));
 
@@ -26,6 +27,9 @@ app.post('/encode', (req, res) => {
     if (encoding) {
         res.json(null);
     } else {
+        if (lastEncoder) {
+            lastEncoder.cleanup();
+        }
         const base = `dash-stream-${encodingIndex}.mpd`;
         const main = `output/${base}`;
 
@@ -43,6 +47,7 @@ app.post('/encode', (req, res) => {
         encoder.start().then(() => {
             encoding = false;
             currentUrl = null;
+            lastEncoder = encoder;
         });
         res.json(url);
     }
