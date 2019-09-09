@@ -42,6 +42,7 @@ class Encoder {
             args.push('-live', '1');
             args.push('-seg_duration', '1');
             args.push('-window_size', '7200');
+            args.push('-hielevel', '3'); // instead of 4
             args.push('-use_template', '1');
             args.push('-use_timeline', '0');
             args.push('-init_seg_name', this.base + '.$RepresentationID$.init.webm');
