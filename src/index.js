@@ -4,7 +4,18 @@ require('./dash.all.min.js');
 
 let FakeDash = require('./fakedash.js');
 
-console.log('hello world');
+const icon = document.getElementById('icon');
+const ua = navigator.userAgent;
+if (ua.match(/Firefox/)) {
+    icon.src = '/firefox.png';
+} else if (ua.match(/Edg/)) {
+    icon.src = '/edge.png';
+} else if (ua.match(/Chrome/)) {
+    icon.src = '/chrome.png';
+} else if (ua.match(/Safari/)) {
+    icon.src = '/safari.png';
+}
+
 
 const output = document.getElementById('output');
 

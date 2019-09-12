@@ -9,22 +9,31 @@
                 color: #000;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
+            #icon {
+                float: right;
+                width: 128px;
+                height: 128px;
+            }
         </style>
     </head>
     <body>
         <h1>AV1 DASH encoding test</h1>
         
-        <fieldset>
-            <button id=encode>Start encoding</button>
-            <div id=stats>
-                <select id=quality>
-                    <option value=auto>Auto</option>
-                </select>
-                <span id=res></span>
-                <span id=bw></span>
-            </div>
-            <div id=output></div>
-        </fieldset>
+        <div>
+            <img id=icon>
+            <fieldset>
+                <button id=encode>Start encoding</button>
+                <div id=stats>
+                    <select id=quality>
+                        <option value=auto>Auto</option>
+                    </select>
+                    <span id=res></span>
+                    <span id=bw></span>
+                </div>
+            </fieldset>
+        </div>
+
+        <div id=output></div>
 
         <script src="main.js"></script>
     </body>
