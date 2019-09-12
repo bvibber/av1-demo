@@ -22,6 +22,7 @@ const output = document.getElementById('output');
 //videojs.log.level('debug');
 
 let video;
+let config;
 let currentUrl;
 
 let segmentSizes = [];
@@ -118,9 +119,16 @@ function showVideo(url) {
             }
         });
         mp.on('qualityChangeRendered', (event) => {
-            //let qual = event.newQuality;
-            let res = `${video.videoWidth}x${video.videoHeight}`;
-            document.getElementById('res').textContent = res;
+            let qual = event.newQuality;
+            //let res = `${video.videoWidth}x${video.videoHeight}`;
+            /*
+            console.log({
+                qual,
+                reso: config.resolutions
+            })
+            */
+            let res = config.resolutions[config.resolutions.length - 1 - qual];
+            document.getElementById('res').textContent = `${res[0]}x${res[1]}`;
         });
         var quality = document.getElementById('quality');
         quality.selectedIndex = 0;
@@ -209,7 +217,8 @@ document.getElementById('encode').onclick = function(event) {
 function awaitConfig() {
     fetch('/config').then((res) => {
         return res.json();
-    }).then((config) => {
+    }).then((config_) => {
+        config = config_;
         let quality = document.getElementById('quality');
         for (let i = 0; i < config.resolutions.length; i++) {
             let res = config.resolutions[i];
