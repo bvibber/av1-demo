@@ -128,6 +128,10 @@ function showVideo(url) {
     video.addEventListener('timeupdate', () => {
         updateBandwidth();
     });
+    video.addEventListener('ended', () => {
+        console.log('LKDJFLKJSDFLKJFLSDKSDJF');
+        document.location.reload();
+    })
 }
 
 function awaitVideo(url) {
@@ -137,11 +141,11 @@ function awaitVideo(url) {
                 awaitVideo(url);
             }, 250);
         } else {
-            // Give an extra half second for things to write more data
+            // Give an extra one and half second for things to write more data
             // Just in case.
             setTimeout(() => {
                 showVideo(url);
-            }, 500);
+            }, 1500);
         }
     });
 }
