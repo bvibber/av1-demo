@@ -69,6 +69,7 @@ function showVideo(url) {
             let res = `${video.videoWidth}x${video.videoHeight}`;
             document.getElementById('res').textContent = res;
         });
+        document.getElementById('quality').disabled = true;
     } else {
         let mp = dashjs.MediaPlayer().create();
         mp.initialize(video, url, true /* autoplay */);
@@ -84,6 +85,33 @@ function showVideo(url) {
             //let qual = event.newQuality;
             let res = `${video.videoWidth}x${video.videoHeight}`;
             document.getElementById('res').textContent = res;
+        });
+        var quality = document.getElementById('quality');
+        quality.selectedIndex = 0;
+        quality.addEventListener('change', () => {
+            console.log(quality.value);
+            if (quality.value == 'auto') {
+                mp.updateSettings({
+                    'streaming': {
+                        'abr': {
+                            'autoSwitchBitrate': {
+                                'video': true
+                            }
+                        }
+                    }
+                });
+            } else {
+                mp.updateSettings({
+                    'streaming': {
+                        'abr': {
+                            'autoSwitchBitrate': {
+                                'video': false
+                            }
+                        }
+                    }
+                });
+                mp.setQualityFor('video', parseInt(quality.value, 10));
+            }
         });
     }
     video.addEventListener('timeupdate', () => {
@@ -138,4 +166,19 @@ document.getElementById('encode').onclick = function(event) {
     });
 };
 
-awaitEncoding();
+function awaitConfig() {
+    fetch('/config').then((res) => {
+        return res.json();
+    }).then((config) => {
+        let quality = document.getElementById('quality');
+        for (let i = 0; i < config.resolutions.length; i++) {
+            let res = config.resolutions[i];
+            let opt = document.createElement('option');
+            opt.value = `${config.resolutions.length - 1 - i}`;
+            opt.textContent = `${res[0]}x${res[1]}`;
+            quality.appendChild(opt);
+        }
+        awaitEncoding();
+    });
+}
+awaitConfig();

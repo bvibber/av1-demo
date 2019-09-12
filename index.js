@@ -11,6 +11,8 @@ let threads = 0; // auto
 //devHack = true; threads = 6;
 
 const Encoder = require('./encoder.js');
+const config = require('./config.json');
+
 let encoding = false;
 let encodingIndex = 0;
 let encoder = null;
@@ -21,6 +23,10 @@ let lastEncoder = null;
 
 app.get('/current', (req, res) => {
     res.json(currentUrl);
+});
+
+app.get('/config', (req, res) => {
+    res.json(config);
 });
 
 app.post('/encode', (req, res) => {
