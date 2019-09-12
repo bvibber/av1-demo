@@ -25,13 +25,33 @@ let video;
 let currentUrl;
 
 let segmentSizes = [];
+let segmentTimes = [];
+let startTime = Date.now();
 function updateBandwidth() {
-    let ratio = 24 / 33;
-    let segment = Math.trunc(video.currentTime * ratio); // hackkkkk
-    let len = segmentSizes[segment] * ratio;
-
-    if (len) {
-        let bw = Math.round(len * 8 / 1000) + 'kbits/s';
+    //let now = Date.now() - startTime;
+    let now = segmentSizes.length; // approx 1s per segment
+    let bytes = 0;
+    let ms = 0;
+    for (let i = segmentSizes.length - 1; i >= 0; i--) {
+        //let duration = now - segmentTimes[i];
+        let duration = (now - i) * 1000;
+        bytes += segmentSizes[i];
+        ms += duration;
+        /*
+        console.log({
+            duration,
+            bytes,
+            ms
+        })
+        */
+        if (ms >= 5000) {
+            // rough rolling average
+            break;
+        }
+    }
+    if (bytes && ms) {
+        let rate = bytes / ms;
+        let bw = Math.round(rate * 8) + 'kbits/s';
         document.getElementById('bw').textContent = bw;
     }
 }
@@ -45,6 +65,8 @@ function showVideo(url) {
         video.parentNode.removeChild(video);
         video = null;
     }
+
+    startTime = Date.now();
 
     const link = document.createElement('a');
     link.href = url;
@@ -75,6 +97,7 @@ function showVideo(url) {
         fd.onsegmentloaded = (arr) => {
             let len = arr.byteLength;
             segmentSizes.push(len);
+            segmentTimes.push(Date.now() - startTime);
         };
         video.addEventListener('loadedmetadata', () => {
             let res = `${video.videoWidth}x${video.videoHeight}`;
@@ -88,8 +111,10 @@ function showVideo(url) {
             //console.log(event);
             if (event.response) {
                 let len = event.response.byteLength;
-                let index = event.request.startTime; // hack
-                segmentSizes[index] = len;
+                //let index = event.request.startTime; // hack
+                //segmentSizes[index] = len;
+                segmentSizes.push(len);
+                segmentTimes.push(Date.now() - startTime);
             }
         });
         mp.on('qualityChangeRendered', (event) => {
