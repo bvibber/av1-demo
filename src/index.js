@@ -141,11 +141,7 @@ function awaitVideo(url) {
                 awaitVideo(url);
             }, 250);
         } else {
-            // Give an extra one and half second for things to write more data
-            // Just in case.
-            setTimeout(() => {
-                showVideo(url);
-            }, 1500);
+            showVideo(url);
         }
     });
 }
